@@ -7,6 +7,7 @@ defmodule UserBackend.Repo.Migrations.CreateUsers do
       add :email, :string, null: false
       add :password_hash, :string
       add :is_verified, :boolean, default: false, null: false
+      add :role, :string, default: nil, null: true
 
       timestamps()
     end

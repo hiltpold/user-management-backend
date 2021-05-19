@@ -2,10 +2,9 @@ defmodule UserBackendWeb.UserController do
   use UserBackendWeb, :controller
   alias UserBackend.Account
   alias UserBackend.Account.User
-  #alias UserBackend.Guardian
   alias UserBackendWeb.Router.Helpers, as: Routes
-  require Logger
   alias UserBackend.Account.Notification
+  require Logger
 
   action_fallback UserBackendWeb.FallbackController
 
@@ -21,17 +20,6 @@ defmodule UserBackendWeb.UserController do
     end
   end
 
-  def send_email(conn, %{"user" => user_params}) do
-    token = "token"
-    Logger.info("Verifing the following token: #{inspect(token)}")
-    verification_url = Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
-    Logger.info("Token URL: #{inspect(verification_url)}")
-    Logger.info("Token URL: #{inspect(user_params)}")
-    {:ok, email_info, response} = Notification.deliver_confirmation(verification_url)
-    Logger.info("#{inspect(response)}")
-    conn |> render("verification_url.json", url: verification_url)
-  end
-
   def register(conn, %{"user" => user_params}) do
     #with {:ok, %User{} = user} <- Account.create_user(user_params) do
     with {:ok, %User{} = user} <- Account.create_user(user_params) do
@@ -39,20 +27,25 @@ defmodule UserBackendWeb.UserController do
         Logger.info("Verifing the following token: #{inspect(token)}")
         verification_url = Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
         Logger.info("Token URL: #{inspect(verification_url)}")
-        {:ok, email_info, response} = Notification.deliver_confirmation_instructions(user, verification_url)
-        Logger.info("#{inspect(response)}")
+        {:ok, email_info} = Notification.deliver_confirmation_instructions(user, verification_url)
         #UserBackend.Notifications.send_account_verification_email(user, verification_url)
         conn |> render("verification_url.json", url: verification_url)
     end
   end
 
   def verify_email(conn, %{"token" => token}) do
+    Logger.info("VERIFY TOKEN: #{inspect(token)}")
+    {:ok, tmp} = UserBackend.Token.verify_new_account_token(token)
+    Logger.info("VERIFY USER ID: #{inspect(tmp)}")
+    #{:ok, u }=Account.get_user!(tmp)
+    #Logger.info("VERIFY USER: #{inspect(u)}")
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
-         {:ok, %User{is_verified: false} = user} <- UserBackend.Users.by_id(user_id) do
-      UserBackend.Accounts.mark_as_verified(user)
+         {:ok, %User{is_verified: false} = user} <- Account.get_user!(user_id) do
+      Logger.info("VERIFY USER ---->: #{inspect(user)}")
+      UserBackend.Account.mark_as_verified(user)
       conn |> render("user.json", user: user)
     else
-      _ -> render("401.json", message: "Invalid token")
+      _ -> render("401.json", message: "The token is invalid.")
     end
   end
 

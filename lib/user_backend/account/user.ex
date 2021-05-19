@@ -8,7 +8,7 @@ defmodule UserBackend.Account.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
-    field :role, :string
+    field :role, :string, default: ""
     field :is_verified, :boolean, default: false
     # Add support for microseconds at the language level
     # for this specific schema
@@ -18,7 +18,7 @@ defmodule UserBackend.Account.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :is_verified, :password])
+    |> cast(attrs, [:email, :is_verified, :password, :role])
     |> validate_required([:email, :is_verified, :password])
     |> validate_format(:email, ~r/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i)
     |> unique_constraint(:email)
