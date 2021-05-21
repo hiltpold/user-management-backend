@@ -37,15 +37,17 @@ defmodule UserBackendWeb.UserController do
     Logger.info("VERIFY TOKEN: #{inspect(token)}")
     {:ok, tmp} = UserBackend.Token.verify_new_account_token(token)
     Logger.info("VERIFY USER ID: #{inspect(tmp)}")
-    #{:ok, u }=Account.get_user!(tmp)
-    #Logger.info("VERIFY USER: #{inspect(u)}")
+    u=Account.get_by!(tmp)
+    Logger.info("VERIFY USER: #{inspect(u)}")
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
-         {:ok, %User{is_verified: false} = user} <- Account.get_user!(user_id) do
+         {:ok, %User{is_verified: false} = user} <- Account.get_by!(user_id) do
       Logger.info("VERIFY USER ---->: #{inspect(user)}")
-      UserBackend.Account.mark_as_verified(user)
+      Account.change_user(user, %{is_verified: true})
       conn |> render("user.json", user: user)
     else
-      _ -> render("401.json", message: "The token is invalid.")
+      _ -> conn
+          |> put_status(:unauthorized)
+          |> render("401.json", message: "token not valid.")
     end
   end
 

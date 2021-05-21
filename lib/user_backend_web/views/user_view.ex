@@ -11,7 +11,7 @@ defmodule UserBackendWeb.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id, email: user.email, is_active: user.is_active}
+    %{id: user.id, email: user.email, is_verified: user.is_verified}
   end
 
   def render("sign_in.json", %{user: user}) do
@@ -31,5 +31,13 @@ defmodule UserBackendWeb.UserView do
 
   def render("verification_url.json", %{url: url}) do
     %{url: url}
+  end
+
+  def render("401.json", %{message: message}) do
+    %{
+      errors: %{
+        detail: message
+      }
+    }
   end
 end
