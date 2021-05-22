@@ -13,11 +13,10 @@ defmodule UserBackendWeb.Router do
     pipe_through :api
     #resources "/users", UserController, except: [:new, :edit]
     #post "/users/sign_in", UserController, :sign_in
-    post "/sign_in", UserController, :sign_in
-    post "/sign_up", UserController, :create
+    post "/login", UserController, :login
     post "/register", UserController, :register
-    post "/send_email", UserController, :send_email
     get "/verify/:token", UserController, :verify_email
+    get "/verify", UserController, :verify_email
   end
 
   scope "/api/v1", UserBackendWeb do

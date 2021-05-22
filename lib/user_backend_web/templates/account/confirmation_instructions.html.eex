@@ -1,0 +1,7 @@
+<p>Hi <%= @user.email %>,</p>
+
+<p>You can confirm your account by visiting the url below:</p>
+
+<p><%= @url %></p>
+
+<p>If you didn't create an account with us, please ignore this.</p>
