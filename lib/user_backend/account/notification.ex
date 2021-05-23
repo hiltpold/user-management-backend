@@ -1,5 +1,5 @@
 defmodule UserBackend.Account.Notification do
-  import Bamboo.Email, view: UserBackendWeb.Account.EmailView
+  use Bamboo.Phoenix, view: UserBackendWeb.Account.EmailView
   alias UserBackend.Mailer
   require Logger
 
@@ -14,14 +14,6 @@ defmodule UserBackend.Account.Notification do
     {:ok, %{to: email.to, body: email.html_body}}
   end
 
-  def deliver_confirmation(user, url) do
-    base_email()
-    |> to(user.email)
-    |> subject("Confirm your account")
-    |> html_body("<strong>Welcome</strong>")
-    |> deliver()
-  end
-
   def deliver_confirmation_instructions(user, url) do
     Logger.info(user)
     base_email()
@@ -30,7 +22,6 @@ defmodule UserBackend.Account.Notification do
     |> assign(:user, user)
     |> assign(:url, url)
     |> render("confirmation_instructions.html")
-    |> html_body("<strong>Welcome</strong>")
     |> deliver()
   end
 

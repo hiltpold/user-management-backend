@@ -46,7 +46,8 @@ defmodule UserBackend.MixProject do
       {:bcrypt_elixir, "~> 2.3.0"},
       {:comeonin, "~> 5.0"},
       {:guardian, "~> 2.0"},
-      {:bamboo, "~> 2.1.0"}
+      {:bamboo, "~> 2.1.0"},
+      {:bamboo_phoenix, "~> 1.0.0"}
     ]
   end
 

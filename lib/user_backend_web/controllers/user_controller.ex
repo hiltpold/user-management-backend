@@ -51,6 +51,7 @@ defmodule UserBackendWeb.UserController do
     conn |> put_status(:unauthorized)
          |> render("401.json", message: "no token provided")
   end
+
   def show(conn, _params) do
     user = UserBackend.Guardian.Plug.current_resource(conn)
     conn |> render("user.json", user: user)
