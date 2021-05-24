@@ -1,4 +1,4 @@
-defmodule UserBackendWeb.UserController do
+defmodule UserBackendWeb.Api.UserController do
   use UserBackendWeb, :controller
   alias UserBackend.Account
   alias UserBackend.Account.User
@@ -21,14 +21,12 @@ defmodule UserBackendWeb.UserController do
   end
 
   def register(conn, %{"user" => user_params}) do
-    #with {:ok, %User{} = user} <- Account.create_user(user_params) do
     with {:ok, %User{} = user} <- Account.create_user(user_params) do
         token = UserBackend.Token.generate_new_account_token(user)
         Logger.info("Verifing the following token: #{inspect(token)}")
         verification_url = System.get_env("BASE_URI") <> Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
         Logger.info("Token URL: #{inspect(verification_url)}")
         {:ok, _} = Notification.deliver_confirmation_instructions(user, verification_url)
-        #UserBackend.Notifications.send_account_verification_email(user, verification_url)
         conn |> render("verification_url.json", url: verification_url)
     end
   end
@@ -37,11 +35,11 @@ defmodule UserBackendWeb.UserController do
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
          {:ok, %User{is_verified: false} = user} <- Account.get_by!(user_id) do
       Account.change_user(user, %{is_verified: true})
-      conn |> render("user.json", user: user)
+      conn |> render("email_verified.json", message: "token is valid")
     else
       _ -> conn
           |> put_status(:unauthorized)
-          |> render("401.json", message: "token not valid")
+          |> render("401.json", message: "token is not valid")
     end
   end
 
@@ -83,20 +81,4 @@ defmodule UserBackendWeb.UserController do
         {:error, :unauthorized}
     end
   end
-
-  #def sign_in(conn, %{"email" => email, "password" => password}) do
-  #  case UserBackend.Account.authenticate_user(email, password) do
-  #    {:ok, user} ->
-  #      conn
-  #      |> put_status(:ok)
-  #      |> put_view(UserBackendWeb.UserView)
-  #      |> render("sign_in.json", user: user)
-
-  #    {:error, message} ->
-  #      conn
-  #      |> put_status(:unauthorized)
-  #      |> put_view(UserBackendWeb.ErrorView)
-  #      |> render("401.json", message: message)
-  #  end
-  #end
 end

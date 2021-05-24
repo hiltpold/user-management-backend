@@ -5,24 +5,43 @@ defmodule UserBackendWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
   pipeline :jwt_authenticated do
     plug UserBackend.Guardian.AuthPipeline
   end
 
-  scope "/api/v1", UserBackendWeb do
+  scope "/api/", UserBackendWeb.Api do
     pipe_through :api
-    #resources "/users", UserController, except: [:new, :edit]
-    #post "/users/sign_in", UserController, :sign_in
-    post "/login", UserController, :login
-    post "/register", UserController, :register
-    get "/verify/:token", UserController, :verify_email
-    get "/verify", UserController, :verify_email
+    scope "/v1/users/" do
+      post "/login", UserController, :login
+      post "/register", UserController, :register
+      get "/verify/:token", UserController, :verify_email
+      get "/verify", UserController, :verify_email
+      #post "/:id/password/reset", UserController, :password_reset
+      #post "/:id/password/renewal", UserController, :password_renewal
+      #post "/:id/password/forgot", UserController, :password_renewal
+      #post "/:id/email/forgot", UserController, :password_renewal
+    end
   end
 
-  scope "/api/v1", UserBackendWeb do
-    pipe_through [:api, :jwt_authenticated]
-    get "/my_user", UserController, :show
+  scope "/api/", UserBackendWeb.Api do
+    scope "/v1/" do
+      pipe_through [:api, :jwt_authenticated]
+      get "/my_user", UserController, :show
+    end
   end
+
+  #scope "/", UserBackendWeb do
+  #  pipe_through :browser # Use the default browser stack
+  #  get "/verify/:token", UserController, :verify_email_test
+  #end
 
   # Enables LiveDashboard only for development
   #

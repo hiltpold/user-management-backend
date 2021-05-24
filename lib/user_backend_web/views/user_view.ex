@@ -33,6 +33,10 @@ defmodule UserBackendWeb.UserView do
     %{url: url}
   end
 
+  def render("email_verified.json", %{message: message}) do
+    %{message: message}
+  end
+
   def render("401.json", %{message: message}) do
     %{
       errors: %{
