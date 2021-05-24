@@ -1,4 +1,4 @@
-defmodule UserBackendWeb.Account.EmailView do
+defmodule UserBackendWeb.EmailView do
   @moduledoc """
   used for the email template
   """

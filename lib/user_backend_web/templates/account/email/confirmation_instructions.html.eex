@@ -1,8 +1,0 @@
-<p>Hi <%= @user.email %>,</p>
-
-<p>You can confirm your account by clicking the button below:</p>
-
-<button class="btn btn-primary">
-    <a href="<%= @url %>">Confirm</a>
-</button>
-<p>If you didn't create an account with us, please ignore this.</p>

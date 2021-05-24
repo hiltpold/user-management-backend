@@ -25,7 +25,7 @@ defmodule UserBackendWeb.UserController do
     with {:ok, %User{} = user} <- Account.create_user(user_params) do
         token = UserBackend.Token.generate_new_account_token(user)
         Logger.info("Verifing the following token: #{inspect(token)}")
-        verification_url = Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
+        verification_url = System.get_env("BASE_URI") <> Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
         Logger.info("Token URL: #{inspect(verification_url)}")
         {:ok, _} = Notification.deliver_confirmation_instructions(user, verification_url)
         #UserBackend.Notifications.send_account_verification_email(user, verification_url)

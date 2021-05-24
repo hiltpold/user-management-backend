@@ -1,9 +1,9 @@
 defmodule UserBackend.Account.Notification do
-  use Bamboo.Phoenix, view: UserBackendWeb.Account.EmailView
+  use Bamboo.Phoenix, view: UserBackendWeb.EmailView
   alias UserBackend.Mailer
   require Logger
 
-  @reply_to "matthias.hiltpold@gmail.com"
+  #@reply_to "matthias.hiltpold@gmail.com"
   @from "defenders-undressed@protonmail.com"
 
   def deliver(%Bamboo.Email{} = email, later \\ false) do
@@ -21,13 +21,14 @@ defmodule UserBackend.Account.Notification do
     |> subject("Account Confirmation")
     |> assign(:user, user)
     |> assign(:url, url)
+    |> put_html_layout({UserBackendWeb.LayoutView, "email.html"})
     |> render("confirmation_instructions.html")
     |> deliver()
   end
 
   defp base_email() do
     new_email()
-    |> put_header("Reply-To", @reply_to)
+    #|> put_header("Reply-To", @reply_to)
     |> from(@from)
   end
 end
