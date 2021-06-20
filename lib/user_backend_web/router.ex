@@ -17,26 +17,27 @@ defmodule UserBackendWeb.Router do
     plug UserBackend.Guardian.AuthPipeline
   end
 
-  scope "/api/", UserBackendWeb.Api do
+  scope "/api/", UserBackendWeb do
     pipe_through :api
     scope "/v1/users/" do
       post "/login", UserController, :login
       post "/register", UserController, :register
       get "/verify/:token", UserController, :verify_email
       get "/verify", UserController, :verify_email
-      #post "/:id/password/reset", UserController, :password_reset
+      post "/password/forgot", UserController, :forgot_password
       #post "/:id/password/renewal", UserController, :password_renewal
       #post "/:id/password/forgot", UserController, :password_renewal
       #post "/:id/email/forgot", UserController, :password_renewal
     end
   end
 
-  scope "/api/", UserBackendWeb.Api do
-    scope "/v1/" do
-      pipe_through [:api, :jwt_authenticated]
-      get "/my_user", UserController, :show
-    end
-  end
+  #scope "/api/", UserBackendWeb.Api do
+  #  scope "/v1/" do
+  #    pipe_through [:api, :jwt_authenticated]
+  #    get "/my_user", UserController, :show
+  #  end
+  #end
+
 
   #scope "/", UserBackendWeb do
   #  pipe_through :browser # Use the default browser stack

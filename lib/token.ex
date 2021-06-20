@@ -10,6 +10,10 @@ defmodule UserBackend.Token do
     Phoenix.Token.sign(UserBackendWeb.Endpoint, @account_verification_salt, user_id)
   end
 
+  def generate_new_token(%User{id: user_id, role: user_role}) do
+    Phoenix.Token.sign(UserBackendWeb.Endpoint, @account_verification_salt, %{id: user_id, role: user_role})
+  end
+
   def verify_new_account_token(token) do
     max_age = 86_400 # tokens that are older than a day should be invalid
     Phoenix.Token.verify(UserBackendWeb.Endpoint, @account_verification_salt, token, max_age: max_age)

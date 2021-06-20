@@ -1,9 +1,10 @@
-defmodule UserBackendWeb.Api.UserController do
+defmodule UserBackendWeb.UserController do
   use UserBackendWeb, :controller
   alias UserBackend.Account
   alias UserBackend.Account.User
   alias UserBackendWeb.Router.Helpers, as: Routes
   alias UserBackend.Account.Notification
+  alias UserBackend.Misc.Utils, as: Utils
   require Logger
 
   action_fallback UserBackendWeb.FallbackController
@@ -50,15 +51,30 @@ defmodule UserBackendWeb.Api.UserController do
          |> render("401.json", message: "no token provided")
   end
 
+  def forgot_password(conn, %{"email" => email}) do
+    new_password = %{password: Utils.random_string(8)}
+    with {:ok, _} = Account.update_user_password(email, new_password),
+         {:ok, _} = Notification.deliver_password_reset_confirmation(email, new_password.password) do
+          conn |> put_status(200)
+               |> json(%{message: "password reset successful"})
+         end
+    #case Account.update_user_password(email, new_password) do
+    #  {:ok, _} ->
+    #    conn
+    #    |> put_status(200)
+    #    |> json(%{message: "password reset successful"})
+    #  {:error, _} ->
+    #    conn
+    #    |> put_status(403)
+    #    |> json(%{error_code: "403"})
+    #end
+  end
+
   def show(conn, _params) do
     user = UserBackend.Guardian.Plug.current_resource(conn)
     conn |> render("user.json", user: user)
   end
 
-  #def show(conn, %{"id" => id}) do
-  #  user = Account.get_user!(id)
-  #  render(conn, "show.json", user: user)
-  #end
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Account.get_user!(id)
     with {:ok, %User{} = user} <- Account.update_user(user, user_params) do

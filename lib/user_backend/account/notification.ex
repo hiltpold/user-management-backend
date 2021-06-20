@@ -26,6 +26,19 @@ defmodule UserBackend.Account.Notification do
     |> deliver()
   end
 
+  def deliver_password_reset_confirmation(email, new_password) do
+    Logger.info("Verifing the following token: #{inspect(new_password)}")
+    Logger.info("Verifing the following token: #{inspect(email)}")
+    base_email()
+    |> to(email)
+    |> subject("Account Confirmation")
+    |> assign(:email, email)
+    |> assign(:new_password, new_password)
+    |> put_html_layout({UserBackendWeb.LayoutView, "email.html"})
+    |> render("confirmation_password_reset.html")
+    |> deliver()
+  end
+
   defp base_email() do
     new_email()
     #|> put_header("Reply-To", @reply_to)

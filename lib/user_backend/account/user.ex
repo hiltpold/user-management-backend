@@ -1,6 +1,9 @@
 defmodule UserBackend.Account.User do
   use Ecto.Schema
   import Ecto.Changeset
+  require Logger
+
+  @roles ~w(user admin)
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -35,7 +38,9 @@ defmodule UserBackend.Account.User do
     changeset
   end
 
-def random_string(length) do
-    :crypto.strong_rand_bytes(length) |> Base.url_encode64
+  def update_password_hash_changeset(user, attrs) do
+    a = user
+        |> cast(attrs, [:password])
+        |> put_password_hash()
   end
 end

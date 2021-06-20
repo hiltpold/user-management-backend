@@ -3,6 +3,6 @@
     <link rel="stylesheet" href="<%= Routes.static_url(UserBackendWeb.Endpoint, "/css/spectre.min.css") %>">
   </head>
   <body>
-    <%= render @view_module, @view_template, assigns %>
+     <%= @inner_content %>
   </body>
 </html>

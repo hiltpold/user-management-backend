@@ -5,8 +5,11 @@ defmodule UserBackend.Account do
 
   import Ecto.Query, warn: false
   alias UserBackend.Repo
-  alias Account.Guardian
+  alias UserBackend.Misc.Utils
   alias UserBackend.Account.User
+  require Logger
+  import Ecto.Changeset
+  alias UserBackend.Account
 
   @doc """
   Returns the list of users.
@@ -54,12 +57,29 @@ defmodule UserBackend.Account do
   def get_by!(id) do
     case Repo.get_by(User, id: id) do
       nil ->
-        {:error, "ERROR"}
+        {:error, "No user with this id exisits"}
       user ->
         {:ok, user}
     end
   end
 
+  def get_by_email!(email) do
+    case Repo.get_by(User, email: email) do
+      nil ->
+        {:error, "No user with this email exisits"}
+      user ->
+        {:ok, user}
+    end
+  end
+
+  def get_by_email(email) do
+    case Repo.get_by(User, email: email) do
+      nil ->
+        {:error, "No user with this email exisits"}
+      user ->
+        {:ok, user}
+    end
+  end
   @doc """
   Creates a user.
 
@@ -113,6 +133,16 @@ defmodule UserBackend.Account do
   end
 
   @doc """
+  TODO
+  """
+  def update_user_password(email, new_password) do
+    with {:ok, %User{} = user} <- get_user_by_email(email) do
+      changes = User.update_password_hash_changeset(user, new_password)
+      Repo.update(changes)
+    end
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking user changes.
 
   ## Examples
@@ -135,15 +165,15 @@ defmodule UserBackend.Account do
   end
 
   defp email_password_auth(email, password) when is_binary(email) and is_binary(password) do
-    with {:ok, user} <- get_by_email(email),
+    with {:ok, user} <- get_user_by_email(email),
     do: verify_password(password, user)
   end
 
-  defp get_by_email(email) when is_binary(email) do
+  defp get_user_by_email(email) when is_binary(email) do
     case Repo.get_by(User, email: email) do
       nil ->
         verify_password()
-        {:error, "Login error."}
+        {:error, "Wrong email or password"}
       user ->
         {:ok, user}
     end
