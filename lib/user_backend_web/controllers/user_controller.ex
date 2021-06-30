@@ -35,7 +35,8 @@ defmodule UserBackendWeb.UserController do
   def verify_email(conn, %{"token" => token}) do
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
          {:ok, %User{is_verified: false} = user} <- Account.get_by!(user_id) do
-      Account.change_user(user, %{is_verified: true})
+      Logger.info("USERUSER: #{inspect(user)}")
+      Account.update_user(user, %{is_verified: true})
       conn |> render("email_verified.json", message: "token is valid")
     else
       _ -> conn

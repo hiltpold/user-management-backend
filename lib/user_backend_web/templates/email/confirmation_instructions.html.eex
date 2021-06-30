@@ -1,5 +1,5 @@
 <p>Hi <%= @user.email %>,</p>
 
-<p>The password has been changed to:</p>
-<p><b><%=@new_password%></b></p>
-<p>Please change the password as soon as possible n.</p>
+<p>You can confirm your account by following the url below:</p>
+<a href="<%= @url %>"><%= @url %></a></p>
+<p>If you didn't create an account with us, please ignore this.</p>

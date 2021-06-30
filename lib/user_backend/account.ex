@@ -111,9 +111,11 @@ defmodule UserBackend.Account do
 
   """
   def update_user(%User{} = user, attrs) do
-    user
-    |> User.changeset(attrs)
-    |> Repo.update()
+    Logger.info("User Input: #{inspect(user)}")
+    a = user
+    |> User.update_user_changeset(attrs)
+    Logger.info("User Input: #{inspect(a)}")
+    a |> Repo.update()
   end
 
   @doc """
@@ -136,6 +138,7 @@ defmodule UserBackend.Account do
   TODO
   """
   def update_user_password(email, new_password) do
+    #new_password = %{password: Utils.random_string(8)}
     with {:ok, %User{} = user} <- get_user_by_email(email) do
       changes = User.update_password_hash_changeset(user, new_password)
       Repo.update(changes)

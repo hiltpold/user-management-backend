@@ -39,8 +39,13 @@ defmodule UserBackend.Account.User do
   end
 
   def update_password_hash_changeset(user, attrs) do
-    a = user
-        |> cast(attrs, [:password])
-        |> put_password_hash()
+    user
+      |> cast(attrs, [:password])
+      |> put_password_hash()
+  end
+
+  def update_user_changeset(user, attrs) do
+    user
+      |> cast(attrs, [:email, :is_verified, :password, :role])
   end
 end

@@ -13,7 +13,7 @@ defmodule UserBackendWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :jwt_authenticated do
+  pipeline :authenticated do
     plug UserBackend.Guardian.AuthPipeline
   end
 
@@ -31,12 +31,12 @@ defmodule UserBackendWeb.Router do
     end
   end
 
-  #scope "/api/", UserBackendWeb.Api do
-  #  scope "/v1/" do
-  #    pipe_through [:api, :jwt_authenticated]
-  #    get "/my_user", UserController, :show
-  #  end
-  #end
+  scope "/api/", UserBackendWeb do
+    scope "/v1/" do
+      pipe_through [:api, :authenticated]
+      get "/my_user", UserController, :show
+    end
+  end
 
 
   #scope "/", UserBackendWeb do
