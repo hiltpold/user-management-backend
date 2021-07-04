@@ -41,11 +41,14 @@ defmodule UserBackend.Account.User do
   def update_password_hash_changeset(user, attrs) do
     user
       |> cast(attrs, [:password])
+      |> validate_required([:password])
       |> put_password_hash()
   end
 
   def update_user_changeset(user, attrs) do
     user
       |> cast(attrs, [:email, :is_verified, :password, :role])
+      |> validate_required([:email, :is_verified, :password, :role])
+      |> unique_constraint(:email)
   end
 end

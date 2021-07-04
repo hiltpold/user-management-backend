@@ -111,11 +111,9 @@ defmodule UserBackend.Account do
 
   """
   def update_user(%User{} = user, attrs) do
-    Logger.info("User Input: #{inspect(user)}")
-    a = user
-    |> User.update_user_changeset(attrs)
-    Logger.info("User Input: #{inspect(a)}")
-    a |> Repo.update()
+    user
+      |> User.update_user_changeset(attrs)
+      |> Repo.update()
   end
 
   @doc """

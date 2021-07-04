@@ -11,11 +11,10 @@ defmodule UserBackend.Account.Notification do
       true -> Mailer.deliver_now(email,response: true)
       false -> Mailer.deliver_later(email,response: true)
     end
-    {:ok, %{to: email.to, body: email.html_body}}
+    {:ok, email}
   end
 
   def deliver_confirmation_instructions(user, url) do
-    Logger.info(user)
     base_email()
     |> to(user.email)
     |> subject("Account Confirmation")
@@ -27,8 +26,6 @@ defmodule UserBackend.Account.Notification do
   end
 
   def deliver_password_reset_confirmation(email, new_password) do
-    Logger.info("Verifing the following token: #{inspect(new_password)}")
-    Logger.info("Verifing the following token: #{inspect(email)}")
     base_email()
     |> to(email)
     |> subject("Account Confirmation")
@@ -41,7 +38,6 @@ defmodule UserBackend.Account.Notification do
 
   defp base_email() do
     new_email()
-    #|> put_header("Reply-To", @reply_to)
     |> from(@from)
   end
 end

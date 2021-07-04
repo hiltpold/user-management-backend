@@ -23,3 +23,6 @@ config :logger, level: :warn
 
 # Relax crypto strength a bit during testing
 config :bcrypt_elixir, :log_rounds, 4
+
+config :user_backend, UserBackend.Mailer,
+  adapter: Bamboo.TestAdapter
