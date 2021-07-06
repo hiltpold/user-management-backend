@@ -91,9 +91,13 @@ defmodule UserBackendWeb.UserController do
   end
 
   def login(conn, %{"email" => email, "password" => password}) do
+    secure=Utils.convert!(System.get_env("SECURE_COOKIE"))
     case Account.token_sign_in(email, password) do
-      {:ok, token, _claims} ->
-        conn |> render("jwt.json", jwt: token)
+      {:ok, token, claims} ->
+        Logger.info("#{inspect(claims)}")
+        conn
+          |> Plug.Conn.put_resp_cookie("token", token, http_only: true, secure: secure, max_age: 604800)
+          |> render("jwt.json", jwt: token)
       _ ->
         {:error, :unauthorized}
     end
