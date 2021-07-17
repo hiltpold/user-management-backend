@@ -21,4 +21,5 @@ defmodule UserBackendWeb.ErrorView do
       }
     }
   end
+
 end

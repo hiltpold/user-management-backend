@@ -72,8 +72,10 @@ defmodule UserBackendWeb.UserController do
   end
 
   def show(conn, _params) do
+    t=conn.req_cookies["guardian_default_token"]
     user = UserBackend.Guardian.Plug.current_resource(conn)
-    conn |> render("user.json", user: user)
+    #conn |> render("user.json", user: user)
+    conn |> json("")
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
@@ -91,15 +93,22 @@ defmodule UserBackendWeb.UserController do
   end
 
   def login(conn, %{"email" => email, "password" => password}) do
-    secure=Utils.convert!(System.get_env("SECURE_COOKIE"))
-    case Account.token_sign_in(email, password) do
-      {:ok, token, claims} ->
-        Logger.info("#{inspect(claims)}")
+    case Account.email_password_auth(email, password) do
+      { :ok, user } ->
         conn
-          |> Plug.Conn.put_resp_cookie("token", token, http_only: true, secure: secure, max_age: 604800)
-          |> render("jwt.json", jwt: token)
-      _ ->
-        {:error, :unauthorized}
-    end
+          |> UserBackend.Guardian.Plug.sign_in(user)
+          |> render("user.json", user: user)
+
+      { :error, message} ->
+        conn
+          |> put_status(:unauthorized)
+          |> render("401.json", message: message)
+      end
+  end
+
+  def logout(conn, _opts) do
+    conn
+     |> UserBackend.Guardian.Plug.sign_out()
+     |> json("success")
   end
 end

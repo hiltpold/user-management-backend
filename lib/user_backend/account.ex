@@ -165,7 +165,7 @@ defmodule UserBackend.Account do
     end
   end
 
-  defp email_password_auth(email, password) when is_binary(email) and is_binary(password) do
+  def email_password_auth(email, password) when is_binary(email) and is_binary(password) do
     with {:ok, user} <- get_user_by_email(email),
     do: verify_password(password, user)
   end

@@ -3,6 +3,7 @@ defmodule UserBackendWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
   end
 
   pipeline :browser do
@@ -18,9 +19,10 @@ defmodule UserBackendWeb.Router do
   end
 
   scope "/api/", UserBackendWeb do
-    pipe_through :api
+    pipe_through [:api]
     scope "/v1/users/" do
       post "/login", UserController, :login
+      post "/logout", UserController, :logout
       post "/register", UserController, :register
       get "/verify/:token", UserController, :verify_email
       get "/verify", UserController, :verify_email
@@ -28,12 +30,22 @@ defmodule UserBackendWeb.Router do
       #post "/:id/password/renewal", UserController, :password_renewal
       #post "/:id/password/forgot", UserController, :password_renewal
       #post "/:id/email/forgot", UserController, :password_renewal
+      #get "/my_user", UserController, :show
     end
   end
 
   scope "/api/", UserBackendWeb do
     scope "/v1/" do
-      pipe_through [:api, :authenticated]
+      #pipe_through [:api, :authenticated]
+      pipe_through [:api]
+      get "/my_user", UserController, :show
+    end
+  end
+
+  scope "/api/", UserBackendWeb do
+    scope "/test/" do
+      #pipe_through [:api, :authenticated]
+      pipe_through [:browser, :authenticated]
       get "/my_user", UserController, :show
     end
   end
