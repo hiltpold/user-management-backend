@@ -98,7 +98,6 @@ defmodule UserBackendWeb.UserController do
         conn
           |> UserBackend.Guardian.Plug.sign_in(user)
           |> render("user.json", user: user)
-
       { :error, message} ->
         conn
           |> put_status(:unauthorized)
@@ -110,5 +109,12 @@ defmodule UserBackendWeb.UserController do
     conn
      |> UserBackend.Guardian.Plug.sign_out()
      |> json("success")
+  end
+
+  def csrf(conn, _opts) do
+    csrf_token = get_csrf_token()
+    conn
+      |> put_session("_csrf_token", Process.get(:plug_unmasked_csrf_token))
+      |> json(%{_csrf_token: csrf_token})
   end
 end

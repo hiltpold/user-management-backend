@@ -1,31 +1,39 @@
 defmodule UserBackendWeb.Router do
   use UserBackendWeb, :router
+  require Logger
 
-  pipeline :api do
+  pipeline :frontend do
     plug :accepts, ["json"]
-    plug :fetch_session
-  end
-
-  pipeline :browser do
-    plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
 
-  pipeline :authenticated do
+  pipeline :init_frontend do
+    plug :accepts, ["json"]
+    plug :fetch_session
+  end
+
+  pipeline :authenticate do
     plug UserBackend.Guardian.AuthPipeline
   end
 
-  scope "/api/", UserBackendWeb do
-    pipe_through [:api]
-    scope "/v1/users/" do
+  scope "/users/", UserBackendWeb do
+    pipe_through [:init_frontend]
+    scope "/v1/" do
+      get "/csrf", UserController, :csrf
+    end
+  end
+
+  scope "/users/", UserBackendWeb do
+    pipe_through [:frontend]
+    scope "/v1/" do
       post "/login", UserController, :login
-      post "/logout", UserController, :logout
-      post "/register", UserController, :register
       get "/verify/:token", UserController, :verify_email
       get "/verify", UserController, :verify_email
+      post "/logout", UserController, :logout
+      post "/register", UserController, :register
       post "/password/forgot", UserController, :forgot_password
       #post "/:id/password/renewal", UserController, :password_renewal
       #post "/:id/password/forgot", UserController, :password_renewal
@@ -35,26 +43,18 @@ defmodule UserBackendWeb.Router do
   end
 
   scope "/api/", UserBackendWeb do
-    scope "/v1/" do
-      #pipe_through [:api, :authenticated]
-      pipe_through [:api]
-      get "/my_user", UserController, :show
-    end
-  end
-
-  scope "/api/", UserBackendWeb do
     scope "/test/" do
-      #pipe_through [:api, :authenticated]
-      pipe_through [:browser, :authenticated]
+      pipe_through [:frontend, :authenticate]
       get "/my_user", UserController, :show
     end
   end
 
-
-  #scope "/", UserBackendWeb do
-  #  pipe_through :browser # Use the default browser stack
-  #  get "/verify/:token", UserController, :verify_email_test
-  #end
+  scope "/users/", UserBackendWeb do
+    pipe_through [:frontend, :authenticate]
+    scope "/v1/" do
+    post "/test", UserController, :show
+     end
+end
 
   # Enables LiveDashboard only for development
   #
