@@ -136,7 +136,6 @@ defmodule UserBackend.Account do
   TODO
   """
   def update_user_password(email, new_password) do
-    #new_password = %{password: Utils.random_string(8)}
     with {:ok, %User{} = user} <- get_user_by_email(email) do
       changes = User.update_password_hash_changeset(user, new_password)
       Repo.update(changes)

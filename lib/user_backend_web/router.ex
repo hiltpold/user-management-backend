@@ -34,7 +34,7 @@ defmodule UserBackendWeb.Router do
       get "/verify", UserController, :verify_email
       post "/logout", UserController, :logout
       post "/register", UserController, :register
-      post "/password/forgot", UserController, :forgot_password
+      post "/password/reset", UserController, :reset_password
       #post "/:id/password/renewal", UserController, :password_renewal
       #post "/:id/password/forgot", UserController, :password_renewal
       #post "/:id/email/forgot", UserController, :password_renewal
@@ -50,11 +50,11 @@ defmodule UserBackendWeb.Router do
   end
 
   scope "/users/", UserBackendWeb do
-    pipe_through [:frontend, :authenticate]
-    scope "/v1/" do
-    post "/test", UserController, :show
+      pipe_through [:frontend, :authenticate]
+      scope "/v1/" do
+      post "/test", UserController, :show
      end
-end
+  end
 
   # Enables LiveDashboard only for development
   #

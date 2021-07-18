@@ -1,6 +1,6 @@
 defmodule UserBackend.Guardian do
   use Guardian, otp_app: :user_backend
-
+  require Logger
   def subject_for_token(resource, _claims) do
     # You can use any value for the subject of your token but
     # it should be useful in retrieving the resource later, see
@@ -23,6 +23,7 @@ defmodule UserBackend.Guardian do
     resource = UserBackend.Account.get_user!(id)
     {:ok,  resource}
   end
+
   def resource_from_claims(_claims) do
     {:error, :reason_for_error}
   end

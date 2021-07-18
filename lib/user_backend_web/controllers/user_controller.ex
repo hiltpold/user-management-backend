@@ -24,9 +24,7 @@ defmodule UserBackendWeb.UserController do
   def register(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Account.create_user(user_params) do
         token = UserBackend.Token.generate_new_account_token(user)
-        Logger.info("Verifing the following token: #{inspect(token)}")
         verification_url = System.get_env("BASE_URI") <> Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
-        Logger.info("Token URL: #{inspect(verification_url)}")
         {:ok, _} = Notification.deliver_confirmation_instructions(user, verification_url)
         conn |> render("verification_url.json", url: verification_url)
     end
@@ -35,7 +33,6 @@ defmodule UserBackendWeb.UserController do
   def verify_email(conn, %{"token" => token}) do
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
          {:ok, %User{is_verified: false} = user} <- Account.get_by!(user_id) do
-      Logger.info("USERUSER: #{inspect(user)}")
       Account.update_user(user, %{is_verified: true})
       conn |> render("email_verified.json", message: "token is valid")
     else
@@ -52,30 +49,18 @@ defmodule UserBackendWeb.UserController do
          |> render("401.json", message: "no token provided")
   end
 
-  def forgot_password(conn, %{"email" => email}) do
+  def reset_password(conn, %{"email" => email}) do
     new_password = %{password: Utils.random_string(8)}
     with {:ok, _} = Account.update_user_password(email, new_password),
          {:ok, _} = Notification.deliver_password_reset_confirmation(email, new_password.password) do
           conn |> put_status(200)
                |> json(%{message: "password reset successful"})
          end
-    #case Account.update_user_password(email, new_password) do
-    #  {:ok, _} ->
-    #    conn
-    #    |> put_status(200)
-    #    |> json(%{message: "password reset successful"})
-    #  {:error, _} ->
-    #    conn
-    #    |> put_status(403)
-    #    |> json(%{error_code: "403"})
-    #end
   end
 
   def show(conn, _params) do
-    t=conn.req_cookies["guardian_default_token"]
-    user = UserBackend.Guardian.Plug.current_resource(conn)
-    #conn |> render("user.json", user: user)
-    conn |> json("")
+    user =  UserBackend.Guardian.Plug.current_resource(conn)
+    conn |> render("user.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
