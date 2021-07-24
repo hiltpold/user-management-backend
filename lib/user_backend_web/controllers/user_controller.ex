@@ -34,6 +34,7 @@ defmodule UserBackendWeb.UserController do
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
          {:ok, %User{is_verified: false} = user} <- Account.get_by!(user_id) do
       Account.update_user(user, %{is_verified: true})
+      Logger.debug inspect Account.update_user(user, %{is_verified: true})
       conn |> render("email_verified.json", message: "token is valid")
     else
       _ -> conn
@@ -80,9 +81,17 @@ defmodule UserBackendWeb.UserController do
   def login(conn, %{"email" => email, "password" => password}) do
     case Account.email_password_auth(email, password) do
       { :ok, user } ->
-        conn
-          |> UserBackend.Guardian.Plug.sign_in(user)
-          |> render("user.json", user: user)
+        Logger.debug inspect user
+        case user.is_verified do
+          true ->
+            conn
+              |> UserBackend.Guardian.Plug.sign_in(user)
+              |> render("user.json", user: user)
+          _ ->
+            conn
+              |> put_status(:forbidden)
+              |> render("403.json", message: "Account not verified")
+        end
       { :error, message} ->
         conn
           |> put_status(:unauthorized)

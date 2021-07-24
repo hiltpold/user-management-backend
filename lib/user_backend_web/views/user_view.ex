@@ -45,6 +45,14 @@ defmodule UserBackendWeb.UserView do
     }
   end
 
+  def render("403.json", %{message: message}) do
+    %{
+      errors: %{
+        detail: message
+      }
+    }
+  end
+
   def render("500.json", %{message: message}) do
     %{
       errors: %{

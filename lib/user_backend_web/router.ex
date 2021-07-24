@@ -23,6 +23,7 @@ defmodule UserBackendWeb.Router do
     pipe_through [:init_frontend]
     scope "/v1/" do
       get "/csrf", UserController, :csrf
+      post "/register", UserController, :register
     end
   end
 
@@ -33,7 +34,6 @@ defmodule UserBackendWeb.Router do
       get "/verify/:token", UserController, :verify_email
       get "/verify", UserController, :verify_email
       post "/logout", UserController, :logout
-      post "/register", UserController, :register
       post "/password/reset", UserController, :reset_password
       #post "/:id/password/renewal", UserController, :password_renewal
       #post "/:id/password/forgot", UserController, :password_renewal
