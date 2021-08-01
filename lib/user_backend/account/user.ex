@@ -21,10 +21,29 @@ defmodule UserBackend.Account.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :is_verified, :password, :role])
-    |> validate_required([:email, :is_verified, :password])
-    |> validate_format(:email, ~r/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i)
+    |> cast(attrs, [:email, :password, :role, :is_verified])
+    |> validate_email()
+    |> validate_password()
+    |> validate_required([:is_verified, :password])
+    |> put_password_hash()
+  end
+
+  defp validate_email(changeset) do
+    changeset
+    |> validate_required([:email])
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_length(:email, max: 160)
+    |> unsafe_validate_unique(:email, UserBackend.Repo)
     |> unique_constraint(:email)
+  end
+
+  defp validate_password(changeset) do
+    changeset
+    |> validate_required([:password])
+    |> validate_length(:password, min: 8, max: 80)
+    |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
+    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
+    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
     |> put_password_hash()
   end
 
@@ -45,9 +64,15 @@ defmodule UserBackend.Account.User do
       |> put_password_hash()
   end
 
+  def change_verified_changeset(user, attrs) do
+    user
+      |> cast(attrs, [:is_verified])
+      |> validate_required([:is_verified])
+  end
+
   def update_user_changeset(user, attrs) do
     user
-      |> cast(attrs, [:email, :is_verified, :password, :role])
+      |> cast(attrs, [:email, :password, :role, :is_verified])
       |> validate_required([:email, :is_verified, :password, :role])
       |> unique_constraint(:email)
   end
