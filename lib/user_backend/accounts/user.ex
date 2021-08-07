@@ -1,4 +1,4 @@
-defmodule UserBackend.Account.User do
+defmodule UserBackend.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
   require Logger

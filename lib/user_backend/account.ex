@@ -1,15 +1,15 @@
-defmodule UserBackend.Account do
+defmodule UserBackend.Accounts do
   @moduledoc """
-  The Account context.
+  The Accounts context.
   """
 
   import Ecto.Query, warn: false
   alias UserBackend.Repo
   alias UserBackend.Misc.Utils
-  alias UserBackend.Account.User
+  alias UserBackend.Accounts.User
   require Logger
   import Ecto.Changeset
-  alias UserBackend.Account
+  alias UserBackend.Accounts
 
   @doc """
   Returns the list of users.

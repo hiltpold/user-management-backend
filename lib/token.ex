@@ -2,7 +2,7 @@ defmodule UserBackend.Token do
   @moduledoc """
   Handles creating and validating tokens.
   """
-  alias UserBackend.Account.User
+  alias UserBackend.Accounts.User
 
   @account_verification_salt "KCrWkXq4DNtasXSVUunMnW/E6nJm0Cje/S+niOUeSho/nHraXXi7HbKX79ktlO4x"
 
