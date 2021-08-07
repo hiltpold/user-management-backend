@@ -7,6 +7,22 @@ defmodule UserBackendWeb.ErrorView do
   #   %{errors: %{detail: "Internal Server Error"}}
   # end
 
+  def render("422.json", %{message: message}) do
+    %{
+      errors: %{
+        detail: message
+      }
+    }
+  end
+
+  def render("400.json", %{message: message}) do
+    %{
+      errors: %{
+        detail: message
+      }
+    }
+  end
+
   # By default, Phoenix returns the status message from
   # the template name. For example, "404.json" becomes
   # "Not Found".
@@ -14,12 +30,5 @@ defmodule UserBackendWeb.ErrorView do
     %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
   end
 
-  def render("401.json", %{message: message}) do
-    %{
-      errors: %{
-        detail: message
-      }
-    }
-  end
 
 end

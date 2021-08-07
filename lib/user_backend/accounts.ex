@@ -93,6 +93,7 @@ defmodule UserBackend.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
+    Logger.debug inspect attrs
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()

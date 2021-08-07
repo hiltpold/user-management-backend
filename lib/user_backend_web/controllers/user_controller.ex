@@ -22,6 +22,9 @@ defmodule UserBackendWeb.UserController do
         verification_url = System.get_env("BASE_URI") <> Routes.user_path(UserBackendWeb.Endpoint, :verify_email, token)
         {:ok, _} = Notification.deliver_confirmation_instructions(user, verification_url)
         conn |> render("verification_url.json", url: verification_url)
+   # else
+   #   {:error, %Ecto.Changeset{}=changeset} -> Logger.debug inspect changeset.errors
+   #   {:error, :user_exists}
     end
   end
 

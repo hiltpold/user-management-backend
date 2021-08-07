@@ -1,4 +1,6 @@
 defmodule UserBackendWeb.FallbackController do
+  import UserBackendWeb.ErrorHelpers
+  require Logger
   @moduledoc """
   Translates controller action results into valid `Plug.Conn` responses.
 
@@ -14,11 +16,25 @@ defmodule UserBackendWeb.FallbackController do
     |> render(:"404")
   end
 
-  def call(conn, {:error, %Ecto.Changeset{}}) do
+  def call(conn, {:error, :user_exists}) do
     conn
-    |> put_status(:unprocessable_entity)
+    |> put_status(:conflict)
     |> put_view(UserBackendWeb.ErrorView)
-    |> render(:"422")
+    |> render(:"409")
+  end
+
+  def call(conn, {:error, %Ecto.Changeset{}=changeset}) do
+    if changeset.errors != nil do
+      conn
+        |> put_status(:bad_request)
+        |> put_view(UserBackendWeb.ErrorView)
+        |> render("400.json", %{message: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)})
+    else
+      conn
+        |> put_status(:unprocessable_entity)
+        |> put_view(UserBackendWeb.ErrorView)
+        |> render(:"422")
+    end
   end
 
   def call(conn, {:error, :unauthorized}) do

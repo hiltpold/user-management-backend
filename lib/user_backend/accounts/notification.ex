@@ -1,4 +1,4 @@
-defmodule UserBackend.Account.Notification do
+defmodule UserBackend.Accounts.Notification do
   use Bamboo.Phoenix, view: UserBackendWeb.EmailView
   alias UserBackend.Mailer
   require Logger
