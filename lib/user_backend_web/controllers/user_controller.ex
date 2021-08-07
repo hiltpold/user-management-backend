@@ -5,6 +5,7 @@ defmodule UserBackendWeb.UserController do
   alias UserBackendWeb.Router.Helpers, as: Routes
   alias UserBackend.Accounts.Notification
   alias UserBackend.Misc.Utils, as: Utils
+  import UserBackendWeb.ErrorHelpers
   require Logger
 
   action_fallback UserBackendWeb.FallbackController
@@ -31,13 +32,20 @@ defmodule UserBackendWeb.UserController do
   def verify_email(conn, %{"token" => token}) do
     with {:ok, user_id} <- UserBackend.Token.verify_new_account_token(token),
          {:ok, %User{is_verified: false} = user} <- Accounts.get_by!(user_id) do
-      Accounts.update_user(user, %{is_verified: true})
-      Logger.debug inspect Accounts.update_user(user, %{is_verified: true})
-      conn |> render("email_verified.json", message: "token is valid")
+          case Accounts.update_user(user, %{is_verified: true}) do
+            {:ok, _ } ->
+              conn
+                |> render("email_verified.json", message: "token is valid")
+            {:error, _} ->
+              conn
+                |> put_status(:internal_server_error)
+                |> put_view(UserBackendWeb.ErrorView)
+                |> render(:"500")
+          end
     else
       _ -> conn
           |> put_status(:unauthorized)
-          |> render("401.json", message: "token is not valid")
+          |> render("401.json", message: "token is not valid or has already been used for activation")
     end
   end
 

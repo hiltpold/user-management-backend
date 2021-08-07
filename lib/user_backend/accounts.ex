@@ -112,9 +112,7 @@ defmodule UserBackend.Accounts do
 
   """
   def update_user(%User{} = user, attrs) do
-    Logger.debug inspect Ecto.Changeset.change(user, attrs)
     user
-      #|> Ecto.Changeset.change(attrs)
       |> User.update_user_changeset(attrs)
       |> Repo.update()
   end

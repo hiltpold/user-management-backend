@@ -11,7 +11,7 @@ defmodule UserBackend.Accounts.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
-    field :role, :string, default: ""
+    field :role, :string, default: "user"
     field :is_verified, :boolean, default: false
     # Add support for microseconds at the language level
     # for this specific schema
@@ -31,7 +31,7 @@ defmodule UserBackend.Accounts.User do
   defp validate_email(changeset) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/)
     |> validate_length(:email, max: 80)
     |> unsafe_validate_unique(:email, UserBackend.Repo)
     |> unique_constraint(:email)
@@ -40,10 +40,11 @@ defmodule UserBackend.Accounts.User do
   defp validate_password(changeset) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 8, max: 80)
-    |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_length(:password, min: 8)
+    |> validate_format(:password, ~r/[0-9]+/, message: "Password must contain a number")
+    |> validate_format(:password, ~r/[A-Z]+/, message: "Password must contain an upper-case letter")
+    |> validate_format(:password, ~r/[a-z]+/, message: "Password must contain a lower-case letter")
+    |> validate_format(:password, ~r/[#\!\?&@\$%^&*\(\)]+/, message: "Password must contain a symbol")
     |> put_password_hash()
   end
 
@@ -72,8 +73,8 @@ defmodule UserBackend.Accounts.User do
 
   def update_user_changeset(user, attrs) do
     user
-      |> cast(attrs, [:email, :password, :role, :is_verified])
-      |> validate_required([:email, :is_verified, :password, :role])
+      |> cast(attrs, [:email, :password, :password_hash, :is_verified, :role])
+      |> validate_required([:email, :password_hash, :is_verified, :role])
       |> unique_constraint(:email)
   end
 end
