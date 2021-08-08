@@ -2,17 +2,17 @@ defmodule UserBackendWeb.Router do
   use UserBackendWeb, :router
   require Logger
 
+  pipeline :init_frontend do
+    plug :accepts, ["json"]
+    plug :fetch_session
+  end
+
   pipeline :frontend do
     plug :accepts, ["json"]
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-  end
-
-  pipeline :init_frontend do
-    plug :accepts, ["json"]
-    plug :fetch_session
   end
 
   pipeline :authenticate do
@@ -22,7 +22,7 @@ defmodule UserBackendWeb.Router do
   scope "/users/", UserBackendWeb do
     pipe_through [:init_frontend]
     scope "/v1/" do
-      get "/csrf", UserController, :csrf
+      get "/csrf", UserController, :csrf # csrf not really neceassry in a json api
       post "/register", UserController, :register
     end
   end

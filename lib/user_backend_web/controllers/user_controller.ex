@@ -35,7 +35,7 @@ defmodule UserBackendWeb.UserController do
           case Accounts.update_user(user, %{is_verified: true}) do
             {:ok, _ } ->
               conn
-                |> render("email_verified.json", message: "token is valid")
+                |> render("message.json", message: "token is valid")
             {:error, _} ->
               conn
                 |> put_status(:internal_server_error)
@@ -96,7 +96,7 @@ defmodule UserBackendWeb.UserController do
           _ ->
             conn
               |> put_status(:forbidden)
-              |> render("403.json", message: "Accounts not verified")
+              |> render("403.json", message: "account not verified")
         end
       { :error, message} ->
         conn
@@ -107,8 +107,9 @@ defmodule UserBackendWeb.UserController do
 
   def logout(conn, _opts) do
     conn
-     |> UserBackend.Guardian.Plug.sign_out()
-     |> json("success")
+      |> UserBackend.Guardian.Plug.sign_out()
+      |> put_status(:ok)
+      |> render("message.json", message: "successfully logged out")
   end
 
   def csrf(conn, _opts) do

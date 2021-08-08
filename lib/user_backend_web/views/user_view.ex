@@ -2,6 +2,10 @@ defmodule UserBackendWeb.UserView do
   use UserBackendWeb, :view
   alias UserBackendWeb.UserView
 
+  def render("message.json", %{message: message}) do
+    %{message: message}
+  end
+
   def render("index.json", %{users: users}) do
     %{data: render_many(users, UserView, "user.json")}
   end
@@ -31,10 +35,6 @@ defmodule UserBackendWeb.UserView do
 
   def render("verification_url.json", %{url: url}) do
     %{url: url}
-  end
-
-  def render("email_verified.json", %{message: message}) do
-    %{message: message}
   end
 
   def render("401.json", %{message: message}) do
