@@ -43,18 +43,20 @@ defmodule UserBackendWeb.Router do
   end
 
   scope "/api/", UserBackendWeb do
-    scope "/test/" do
+    scope "/v1/franchises" do
       pipe_through [:frontend, :authenticate]
-      get "/my_user", UserController, :show
+      get "/:id", FranchiseController, :show
     end
   end
 
-  scope "/users/", UserBackendWeb do
-      pipe_through [:frontend, :authenticate]
-      scope "/v1/" do
-      post "/test", UserController, :show
-     end
+  scope "/franchises/", UserBackendWeb do
+    pipe_through [:frontend, :authenticate]
+    scope "/v1/" do
+    post "/test", UserController, :show
+    end
   end
+
+
 
   # Enables LiveDashboard only for development
   #
